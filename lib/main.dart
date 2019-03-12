@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/rendering.dart';
 
-import './product_manager.dart';
+import './pages/home.dart';
 
 // void main() => runApp(MyApp());
 void main() {
@@ -22,13 +22,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.deepOrange,
         accentColor: Colors.deepPurple
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('EasyList'),
-        ),
-        // named argument 에 value 넘길 때 : 을 쓴다.
-        body: ProductManager(startingProduct: 'Food Tester'),
-      ),
+      home: HomePage()
     );
   }
 }

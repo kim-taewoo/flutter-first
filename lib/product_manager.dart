@@ -4,11 +4,12 @@ import './products.dart';
 import './product_control.dart';
 
 class ProductManager extends StatefulWidget {
-  final String startingProduct;
+  final Map<String, String> startingProduct;
 
   // named argument 는 {} 을 써야 한다. 
   // optional(default) 값을 = 을 이용해서 넣을 수 있다.
-  ProductManager({this.startingProduct = 'Sweets Tester'}) {
+  // ProductManager({this.startingProduct = 'Sweets Tester'}) {
+  ProductManager({this.startingProduct}) {
     print('[ProductManager Widget] Constructor');
   }
 
@@ -21,7 +22,7 @@ class ProductManager extends StatefulWidget {
 
 
 class _ProductManagerState extends State<ProductManager> {
-  List<String> _products = [];
+  List<Map<String, String>> _products = [];
      
   // initState() 가 아래의 build 보다 먼저 실행되기 때문에 
   // rerender 하는 데만 쓰이는 setState() 가 올 필요가 없다. 
@@ -30,9 +31,11 @@ class _ProductManagerState extends State<ProductManager> {
   @override
   void initState() {
     super.initState();
+    if (widget.startingProduct != null) {
+      _products.add(widget.startingProduct);      
+    }
     print('[ProductManager State] initState()');
     // 연결된 위젯의 구성요소에 접근가능한 widget. 키워드는 State Object 에서 제공됨.
-    _products.add(widget.startingProduct);
   }
 
   // 새로운 external data 를 받을 때마다 didUpdateWidget 이 실행된다. 
@@ -43,13 +46,20 @@ class _ProductManagerState extends State<ProductManager> {
   // didUpdate 는 근데 맨 처음에도 발생되긴 한다. 처음도 update 긴 하니까?
   @override
   void didUpdateWidget(ProductManager oldWidget) {
-    print('[ProductManager State] didUpdateWidget()');
     super.didUpdateWidget(oldWidget);
+    print('[ProductManager State] didUpdateWidget()');
   }
-
-  void _addProduct(String product) {
+  // 만약 Map 의 value 값이 다양하게 섞여 있다면, generic type 를 dynamic 이라고 쓴다.
+  // ex) Map<String, dynamic>
+  void _addProduct(Map<String, String> product) {
     setState(() {
       _products.add(product);
+    });
+  }
+
+  void _deleteProduct(int index) {
+    setState(() {
+      _products.removeAt(index);
     });
   }
 
@@ -63,7 +73,9 @@ class _ProductManagerState extends State<ProductManager> {
           // 바로 실행시킬 게 아니라서 reference 만 보냄.
           child: ProductControl(_addProduct),
         ),
-        Products(_products)
+        // Expanded 는 남은 모든 부분을 차지하도록 함. 
+        // Expanded 를 안 쓸거면 원래는 Container(height: 300.0, child: Products(_products)) 같이 직접 높이를 지정해주어야 한다.
+        Expanded(child: Products(_products, deleteProduct: _deleteProduct))
       ],
     );
   }
