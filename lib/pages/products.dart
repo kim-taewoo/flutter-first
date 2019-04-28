@@ -4,11 +4,11 @@ import '../product_manager.dart';
 // import './products_admin.dart';
 
 class ProductsPage extends StatelessWidget {
-  final List<Map<String, String>> products;
-  final Function addProduct;
-  final Function deleteProduct;
+  final List<Map<String, dynamic>> products;
+  // final Function addProduct;
+  // final Function deleteProduct;
 
-  ProductsPage(this.products, this.addProduct, this.deleteProduct);
+  ProductsPage(this.products);
 
 
   @override
@@ -36,7 +36,7 @@ class ProductsPage extends StatelessWidget {
       ),
       // named argument 에 value 넘길 때 : 을 쓴다. python 과 달리 = 이 아냐!
       // body: ProductManager(startingProduct: 'Food Tester'),
-      body: ProductManager(products, addProduct, deleteProduct),
+      body: ProductManager(products),
     );
   }
 }

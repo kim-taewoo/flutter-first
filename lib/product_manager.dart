@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import './products.dart';
-import './product_control.dart';
+// import './product_control.dart';
 
 class ProductManager extends StatelessWidget {
-  final List<Map<String, String>> products;
-  final Function addProduct;
-  final Function deleteProduct;
+  final List<Map<String, dynamic>> products;
+  // final Function addProduct;
+  // final Function deleteProduct;
 
-  ProductManager(this.products, this.addProduct, this.deleteProduct);
+  ProductManager(this.products);
 
 
 //   final Map<String, String> startingProduct;
@@ -82,14 +82,14 @@ class ProductManager extends StatelessWidget {
     print('[ProductManager State] build()');
     return Column(
       children: [
-        Container(
-          margin: EdgeInsets.all(10.0),
-          // 바로 실행시킬 게 아니라서 reference 만 보냄.
-          child: ProductControl(addProduct),
-        ),
+        // Container(
+        //   margin: EdgeInsets.all(10.0),
+        //   // 바로 실행시킬 게 아니라서 reference 만 보냄.
+        //   child: ProductControl(addProduct),
+        // ),
         // Expanded 는 남은 모든 부분을 차지하도록 함. 
         // Expanded 를 안 쓸거면 원래는 Container(height: 300.0, child: Products(_products)) 같이 직접 높이를 지정해주어야 한다.
-        Expanded(child: Products(products, deleteProduct: deleteProduct))
+        Expanded(child: Products(products))
       ],
     );
   }
