@@ -17,38 +17,56 @@ class Products extends StatelessWidget {
 
   Widget _buildProductItem(BuildContext context, int index) {
     return Card(
+      margin: EdgeInsets.all(10),
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: InkWell(
+      splashColor: Colors.blue.withAlpha(30),
+      onTap: () =>
+          Navigator.pushNamed<bool>(context, '/product/' + index.toString())
+              .then((bool value) {
+            if (value) {
+              deleteProduct(index);
+            }
+            // .push method 는 자바스크립트의 Promise 와 유사한 Future 를 리턴한다.
+            // Future 는 어떤 waiting state Object 라고 할 수 있는데, 언젠가 일어날 것을 알기에 대기타고 있다가
+            // 해당 이벤트가 일어나면 지정된 함수를 실행시킨다.
+            // push에 마우스를 올렸을 때 뜨는 설명란의 <T> 는 generic type 를 뜻한다.
+            // 즉 어떤 generic type 든 받아올 수 있으며, 지금 이 경우 bool 임을 push 뒤와 then 의 argument 에 적어준다.
+            // print(value)
+          }),
       child: Column(
         children: <Widget>[
           Image.asset(products[index]['image']),
-          Text(products[index]['title']),
-          ButtonBar(
-            alignment: MainAxisAlignment.center,
-            children: <Widget>[
-              FlatButton(
-                child: Text('Details'),
-                onPressed: () => Navigator.push<bool>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => ProductPage(
-                            products[index]['title'], products[index]['image']),
-                      ),
-                    ).then((bool value) {
-                          if (value) {
-                            deleteProduct(index);
-                          }
-                          // .push method 는 자바스크립트의 Promise 와 유사한 Future 를 리턴한다.
-                          // Future 는 어떤 waiting state Object 라고 할 수 있는데, 언젠가 일어날 것을 알기에 대기타고 있다가
-                          // 해당 이벤트가 일어나면 지정된 함수를 실행시킨다.
-                          // push에 마우스를 올렸을 때 뜨는 설명란의 <T> 는 generic type 를 뜻한다.
-                          // 즉 어떤 generic type 든 받아올 수 있으며, 지금 이 경우 bool 임을 push 뒤와 then 의 argument 에 적어준다.
-                          // print(value)
-                        }),
-              )
-            ],
+          Container(
+            padding: EdgeInsets.all(8),
+            child: Text(products[index]['title']),
           )
+
+          // ButtonBar(
+          //   alignment: MainAxisAlignment.center,
+          //   children: <Widget>[
+          //     FlatButton(
+          //       child: Text('Details'),
+          //       onPressed: () => Navigator.pushNamed<bool>(
+          //                   context, '/product/' + index.toString())
+          //               .then((bool value) {
+          //             if (value) {
+          //               deleteProduct(index);
+          //             }
+          //             // .push method 는 자바스크립트의 Promise 와 유사한 Future 를 리턴한다.
+          //             // Future 는 어떤 waiting state Object 라고 할 수 있는데, 언젠가 일어날 것을 알기에 대기타고 있다가
+          //             // 해당 이벤트가 일어나면 지정된 함수를 실행시킨다.
+          //             // push에 마우스를 올렸을 때 뜨는 설명란의 <T> 는 generic type 를 뜻한다.
+          //             // 즉 어떤 generic type 든 받아올 수 있으며, 지금 이 경우 bool 임을 push 뒤와 then 의 argument 에 적어준다.
+          //             // print(value)
+          //           }),
+          //     )
+          //   ],
+          // )
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildProductList() {
