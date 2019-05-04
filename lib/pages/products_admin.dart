@@ -15,47 +15,59 @@ class ProductAdminPage extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        drawer: Drawer(
-          child: Column(
-            children: <Widget>[
-              AppBar(
-                automaticallyImplyLeading: false,
-                title: Text('메뉴'),
-                backgroundColor: Colors.blue,
-              ),
-              ListTile(
-                title: Text('모든 상품 관리'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/');
-                //   Navigator.pushReplacement(
-                //       context,
-                //       MaterialPageRoute(
-                //           builder: (BuildContext context) => ProductsPage()));
-                },
-              )
-            ],
+          drawer: Drawer(
+            child: Column(
+              children: <Widget>[
+                AppBar(
+                  automaticallyImplyLeading: false,
+                  title: Text('메뉴'),
+                  backgroundColor: Colors.blue,
+                ),
+                ListTile(
+                  leading: Icon(Icons.shop),
+                  title: Text('모든 상품 관리'),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/products');
+                    //   Navigator.pushReplacement(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //           builder: (BuildContext context) => ProductsPage()));
+                  },
+                )
+              ],
+            ),
           ),
-        ),
-        appBar: AppBar(
-          title: Text('ProductAdminPage'),
-          bottom: TabBar(
-            tabs: <Widget>[
-              Tab(
-                icon: Icon(Icons.create),
-                text: 'Create Product',
-              ),
-              Tab(
-                icon: Icon(Icons.list),
-                text: 'My Products',
-              ),
-            ],
+          appBar: AppBar(
+            title: Text('ProductAdminPage'),
+            bottom: TabBar(
+              onTap: (int value) {
+                FocusScope.of(context).detach();
+              },
+              tabs: <Widget>[
+                Tab(
+                  icon: Icon(Icons.create),
+                  text: 'Create Product',
+                ),
+                Tab(
+                  icon: Icon(Icons.list),
+                  text: 'My Products',
+                ),
+              ],
+            ),
           ),
-        ),
-        body: TabBarView(children: <Widget>[
-          ProductCreatePage(addProduct),
-          ProductListPage(),
-        ],)
-      ),
+          body: GestureDetector(
+            onTap: () {
+              // FocusScope.of(context).requestFocus(FocusNode());
+              // 위처럼 새로이 의미없는 오브젝트 생성하는 것보다 아래가 나을듯?
+              FocusScope.of(context).detach();
+            },
+            child: TabBarView(
+              children: <Widget>[
+                ProductCreatePage(addProduct),
+                ProductListPage(),
+              ],
+            ),
+          )),
     );
   }
 }

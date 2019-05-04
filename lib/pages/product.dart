@@ -1,41 +1,43 @@
-// import 'dart:async';
+import 'dart:async';
 // dart:async 원래 불러와야 되는데 주석처리해도 되는 거 보니 어떤 라이브러리에 포함이 된듯..?
-
 import 'package:flutter/material.dart';
+
+import '../widgets/ui_elements/title_default.dart';
 
 class ProductPage extends StatelessWidget {
   final String title;
   final String imageUrl;
+  final double price;
+  final String description;
 
-  ProductPage(this.title, this.imageUrl);
+  ProductPage(this.title, this.imageUrl, this.price, this.description);
 
   _showWarningDialog(BuildContext context) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('정말 지울까요?'),
-          content: Text('되돌릴 수 없습니다.'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('취소'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            FlatButton(
-              child: Text('확인'),
-              onPressed: () {
-                Navigator.pop(context); // 이건 dialog 닫는 pop
-                Navigator.pop(context,
-                    true); // 이건 기존 설정해둔 삭제하겠다는 true 값과 함께 products 페이지로 나가는 pop
-              },
-            ),
-          ],
-        );
-      });
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('정말 지울까요?'),
+            content: Text('되돌릴 수 없습니다.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('취소'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text('확인'),
+                onPressed: () {
+                  Navigator.pop(context); // 이건 dialog 닫는 pop
+                  Navigator.pop(context,
+                      true); // 이건 기존 설정해둔 삭제하겠다는 true 값과 함께 products 페이지로 나가는 pop
+                },
+              ),
+            ],
+          );
+        });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -67,20 +69,37 @@ class ProductPage extends StatelessWidget {
               Image.asset(imageUrl),
               Container(
                 padding: EdgeInsets.all(10.0),
-                child: Text(title),
+                child: TitleDefault(title),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text('서울시 종로구 혜화동',
+                      style: TextStyle(
+                        fontFamily: 'Gyeonggi',
+                        fontSize: 16,
+                      )),
+                  Container(
+                    child: Text('|'),
+                    margin: EdgeInsets.symmetric(horizontal: 5.0),
+                  ),
+                  Text('\$${price.toString()}',
+                      style: TextStyle(
+                        fontFamily: 'Gyeonggi',
+                        fontSize: 16,
+                      ))
+                ],
               ),
               Container(
-                padding: EdgeInsets.all(10.0),
-                child: RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  child: Text(
-                    '삭제',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () {
-                    _showWarningDialog(context);
-                  },
-                  // pop 위에 마우스를 올려보면 알겠지만, generic type 이기 때문에 true 외에도 text든 뭐든 넣어서 돌려보낼 수도 있다.
+                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 30.0),
+                height: 1.0,
+                color: Colors.grey,
+              ),
+              Container(
+                padding: EdgeInsets.all(18.0),
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
                 ),
               )
             ],

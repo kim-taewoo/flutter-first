@@ -40,6 +40,7 @@ flutter:
   assets:
     - assets/glass.jpg
     - assets/food.jpg
+    - assets/background.jpg
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -53,10 +54,17 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Gyeonggi
+      fonts:
+        - asset: fonts/Gyeonggi_Regular.ttf
+          weight: 400
+        - asset: fonts/Gyeonggi_Bold.ttf
+          weight: 800
+    - family: Gyeonggi_title
+      fonts:
+        - asset: fonts/Gyeonggi_Title.ttf
+          weight: 400
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

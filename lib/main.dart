@@ -45,12 +45,16 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
           brightness: Brightness.light,
           primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepPurple),
+          accentColor: Colors.deepPurple,
+          buttonColor: Colors.deepPurple,
+          ),
       // home: AuthPage(),
       routes: {
         // '/' 는 home 이랑 역할이 같아서 둘 중 하나는 없애줘야 제대로 작동한다.
-        '/': (BuildContext context) => ProductsPage(_products),
-        '/admin': (BuildContext context) => ProductAdminPage(_addProduct, _deleteProduct),
+        '/': (BuildContext context) => AuthPage(),
+        '/products': (BuildContext context) => ProductsPage(_products),
+        '/admin': (BuildContext context) =>
+            ProductAdminPage(_addProduct, _deleteProduct),
       },
       // Routing 에 데이터를 첨부해야할 경우 onGenerateRoute 를 쓴다. 위 routes에 등록되지 않은 것이어야만 가능.
       onGenerateRoute: (RouteSettings settings) {
@@ -62,7 +66,11 @@ class _MyAppState extends State<MyApp> {
           final int index = int.parse(pathElements[2]);
           return MaterialPageRoute<bool>(
             builder: (BuildContext context) => ProductPage(
-                _products[index]['title'], _products[index]['image']),
+                  _products[index]['title'],
+                  _products[index]['image'],
+                  _products[index]['price'],
+                  _products[index]['description'],
+                ),
           );
         }
         return null; // parsing 에 실패하면 아무 페이지도 불러오지 않는다.
@@ -70,8 +78,7 @@ class _MyAppState extends State<MyApp> {
       // 예는 onGenerateRoute 같은 걸로 페이지 이동하는 게 실패하면 뭘 할 지를 말해준다. 404 페이지 같은 것.
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-          builder: (BuildContext context) => ProductsPage(_products)
-        );
+            builder: (BuildContext context) => ProductsPage(_products));
       },
     );
   }
