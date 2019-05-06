@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart'; // flum 까지 치면 자동완성
 
-class ProductCreatePage extends StatefulWidget {
+class ProductEditPage extends StatefulWidget {
   final Function addProduct;
+  final Function updateProduct;
+  final Map<String, dynamic> product;
+  final int productIndex;
 
-  ProductCreatePage(this.addProduct);
+  ProductEditPage({this.addProduct, this.updateProduct, this.product, this.productIndex});
 
   @override
   State<StatefulWidget> createState() {
-    return _ProductCreatePageState();
+    return _ProductEditPageState();
   }
 }
 
-class _ProductCreatePageState extends State<ProductCreatePage> {
-  String _titleValue;
-  String _descriptionValue;
-  double _priceValue;
+class _ProductEditPageState extends State<ProductEditPage> {
+  final Map<String, dynamic> _formData = {
+    'title': null,
+    'description': null,
+    'price': null,
+    'image': 'assets/food.jpg'
+  };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void _submitForm() {
@@ -22,13 +28,18 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       return;
     }
     _formKey.currentState.save();
-    final Map<String, dynamic> product = {
-      'title': _titleValue,
-      'description': _descriptionValue,
-      'price': _priceValue,
-      'image': 'assets/food.jpg'
-    };
-    widget.addProduct(product);
+    // final Map<String, dynamic> product = {
+    //   'title': _titleValue,
+    //   'description': _descriptionValue,
+    //   'price': _priceValue,
+    //   'image': 'assets/food.jpg'
+    // };
+
+    if (widget.product == null) {
+      widget.addProduct(_formData);      
+    } else {
+      widget.updateProduct(widget.productIndex, _formData);
+    }
     Navigator.pushReplacementNamed(context, '/products');
   }
 
@@ -37,8 +48,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500 : deviceWidth * 0.95;
     final double targetPadding = deviceWidth - targetWidth;
-
-    return Container(
+    final Widget pageContent = Container(
       margin: EdgeInsets.all(15),
       child: Form(
         key: _formKey,
@@ -47,6 +57,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
           children: <Widget>[
             TextFormField(
               decoration: InputDecoration(labelText: '상품명'),
+              initialValue: widget.product == null ? '' : widget.product['title'],
               // autovalidate: true,
               validator: (String value) {
                 // if (value.trim().length <= 0) {
@@ -62,12 +73,13 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
                 // onSaved 할때 setState() 를 통해 다시 build 를 하는 건 낭비다.
                 // 어차피 한 번에 폼 전송하고 끝나는 거니까, 그냥 변수에 저장하기만
                 // 하면 되고, 따라서 setState() 를 없애준다.
-                _titleValue = value;
+                _formData['title'] = value;
               },
             ),
             TextFormField(
               decoration: InputDecoration(labelText: '상품 설명'),
               maxLines: 4,
+              initialValue: widget.product == null ? '' : widget.product['description'],
               validator: (String value) {
                 // if (value.trim().length <= 0) {
                 if (value.isEmpty || value.length < 10) {
@@ -75,12 +87,15 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
                 }
               },
               onSaved: (String value) {
-                _descriptionValue = value;
+                _formData['description'] = value;
               },
             ),
             TextFormField(
               decoration: InputDecoration(labelText: '가격'),
               keyboardType: TextInputType.number,
+              initialValue: widget.product == null
+                  ? ''
+                  : widget.product['price'].toString(),
               validator: (String value) {
                 // if (value.trim().length <= 0) {
                 if (value.isEmpty ||
@@ -89,7 +104,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
                 }
               },
               onSaved: (String value) {
-                _priceValue =
+                _formData['price'] =
                     double.parse(value.replaceFirst(RegExp(r','), '.'));
               },
             ),
@@ -107,6 +122,16 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
         ),
       ),
     );
+
+    return widget.product == null
+        ? pageContent
+        : Scaffold(
+            appBar: AppBar(
+              title: Text('Edit Product'),
+            ),
+            body: pageContent,
+          );
+
     // Center(
     //   child: RaisedButton(
     //     child: Text('저장하기'),

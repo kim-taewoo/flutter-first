@@ -32,6 +32,12 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _updateProduct(int index, Map<String, dynamic> product) {
+    setState(() {
+      _products[index] = product;
+    });
+  }
+
   void _deleteProduct(int index) {
     setState(() {
       _products.removeAt(index);
@@ -54,7 +60,7 @@ class _MyAppState extends State<MyApp> {
         '/': (BuildContext context) => AuthPage(),
         '/products': (BuildContext context) => ProductsPage(_products),
         '/admin': (BuildContext context) =>
-            ProductAdminPage(_addProduct, _deleteProduct),
+            ProductAdminPage(_addProduct, _updateProduct, _deleteProduct, _products),
       },
       // Routing 에 데이터를 첨부해야할 경우 onGenerateRoute 를 쓴다. 위 routes에 등록되지 않은 것이어야만 가능.
       onGenerateRoute: (RouteSettings settings) {

@@ -11,9 +11,55 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  String _emailValue;
-  String _passwordValue;
-  bool _acceptTerms = false;
+  final Map<String, dynamic> _formData = {
+    'email': null,
+    'password': null,
+    'acceptTerms': false
+  };
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  Widget _buildEmailTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: 'E-Mail', filled: true, fillColor: Colors.white),
+      keyboardType: TextInputType.emailAddress,
+      validator: (String value) {
+        if (value.isEmpty ||
+            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                .hasMatch(value)) {
+          return 'Please enter a valid email';
+        }
+      },
+      onSaved: (String value) {
+        _formData['email'] = value;
+      },
+    );
+  }
+
+  Widget _buildPasswordTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: 'Password', filled: true, fillColor: Colors.white),
+      obscureText: true,
+      validator: (String value) {
+        if (value.isEmpty || value.length < 6) {
+          return 'Password invalid';
+        }
+      },
+      onSaved: (String value) {
+        _formData['password'] = value;
+      },
+    );
+  }
+
+  void _submitForm() {
+    if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
+      return;
+    }
+    _formKey.currentState.save();
+    print(_formData);
+    Navigator.pushReplacementNamed(context, '/products');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,55 +83,34 @@ class _AuthPageState extends State<AuthPage> {
           child: SingleChildScrollView(
             child: Container(
               width: targetWidth,
-              child: Column(children: <Widget>[
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: 'E-mail',
-                      fillColor: Colors.white,
-                      filled: true),
-                  keyboardType: TextInputType.emailAddress,
-                  onChanged: (String value) {
-                    setState(() {
-                      _emailValue = value;
-                    });
-                  },
-                ),
-                SizedBox(
-                  height: 10.0,
-                ),
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: 'Password',
-                      fillColor: Colors.white,
-                      filled: true),
-                  obscureText: true,
-                  onChanged: (String value) {
-                    setState(() {
-                      _passwordValue = value;
-                    });
-                  },
-                ),
-                SwitchListTile(
-                    value: _acceptTerms,
-                    onChanged: (bool value) {
-                      setState(() {
-                        _acceptTerms = value;
-                      });
-                    },
-                    title: Text('Accept terms')),
-                SizedBox(
-                  height: 10.0,
-                ),
-                RaisedButton(
-                  color: Theme.of(context).primaryColor,
-                  textColor: Colors.white,
-                  child: Text('Login'),
-                  onPressed: () {
-                    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => ProductsPage()),);
-                    Navigator.pushReplacementNamed(context, '/products');
-                  },
-                ),
-              ]),
+              child: Form(
+                key: _formKey,
+                child: Column(children: <Widget>[
+                  // 이런식으로 위젯을 outsource 할 수도 있다.
+                  _buildEmailTextField(),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  _buildPasswordTextField(),
+                  SwitchListTile(
+                      value: _formData['acceptTerms'],
+                      onChanged: (bool value) {
+                        setState(() {
+                          _formData['acceptTerms'] = value;
+                        });
+                      },
+                      title: Text('Accept terms')),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  RaisedButton(
+                    color: Theme.of(context).primaryColor,
+                    textColor: Colors.white,
+                    child: Text('Login'),
+                    onPressed: _submitForm,
+                  ),
+                ]),
+              ),
             ),
           ),
         ),
