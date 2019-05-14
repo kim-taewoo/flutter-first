@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import './widgets/products/products.dart';
+import './models/product.dart';
 // import './product_control.dart';
 
 class ProductManager extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  // final List<Map<String, dynamic>> products;
+  final List<Product> products;
   // final Function addProduct;
   // final Function deleteProduct;
 
@@ -89,7 +91,7 @@ class ProductManager extends StatelessWidget {
         // ),
         // Expanded 는 남은 모든 부분을 차지하도록 함. 
         // Expanded 를 안 쓸거면 원래는 Container(height: 300.0, child: Products(_products)) 같이 직접 높이를 지정해주어야 한다.
-        Expanded(child: Products(products))
+        Expanded(child: Products())
       ],
     );
   }

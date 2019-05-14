@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart'; // flum 까지 치면 자동완성
 
-class ProductEditPage extends StatefulWidget {
-  final Function addProduct;
-  final Function updateProduct;
-  final Map<String, dynamic> product;
-  final int productIndex;
+import 'package:scoped_model/scoped_model.dart';
 
-  ProductEditPage({this.addProduct, this.updateProduct, this.product, this.productIndex});
+import '../models/product.dart';
+import '../scoped-models/products.dart';
+
+class ProductEditPage extends StatefulWidget {
+  // final Function addProduct;
+  // final Function updateProduct;
+  // // final Map<String, dynamic> product;
+  // final Product product;
+  // final int productIndex;
+
+  // ProductEditPage(
+  //     {this.addProduct, this.updateProduct, this.product, this.productIndex});
 
   @override
   State<StatefulWidget> createState() {
@@ -23,7 +30,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  void _submitForm() {
+  void _submitForm(Function addProduct, Function updateProduct, [int selectedProductIndex]) {
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -35,20 +42,44 @@ class _ProductEditPageState extends State<ProductEditPage> {
     //   'image': 'assets/food.jpg'
     // };
 
-    if (widget.product == null) {
-      widget.addProduct(_formData);      
+    if (selectedProductIndex == null) {
+      addProduct(Product(
+        title: _formData['title'],
+        description: _formData['description'],
+        price: _formData['price'],
+        image: _formData['image'],
+      ));
     } else {
-      widget.updateProduct(widget.productIndex, _formData);
+      updateProduct(
+          Product(
+            title: _formData['title'],
+            description: _formData['description'],
+            price: _formData['price'],
+            image: _formData['image'],
+          ));
     }
     Navigator.pushReplacementNamed(context, '/products');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final double deviceWidth = MediaQuery.of(context).size.width;
+  Widget _buildSubmitButton() {
+    return ScopedModelDescendant<ProductsModel>(
+      builder: (BuildContext context, Widget child, ProductsModel model) {
+        return OutlineButton(
+          // color: Theme.of(context).errorColor,
+          textColor: Colors.red,
+          child: Text('등록'),
+          // _submitForm 을 또다시 화살표 함수로 감싸줌으로써, onPressed 가 눌려졌을 때만 _submitForm 을 호출하게 한다. 
+          onPressed: () => _submitForm(model.addProduct, model.updateProduct, model.selectedProductIndex),
+        );
+      },
+    );
+  }
+
+  Widget _buildPageContent(BuildContext context, Product product) {
+final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500 : deviceWidth * 0.95;
     final double targetPadding = deviceWidth - targetWidth;
-    final Widget pageContent = Container(
+    return Container(
       margin: EdgeInsets.all(15),
       child: Form(
         key: _formKey,
@@ -57,7 +88,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
           children: <Widget>[
             TextFormField(
               decoration: InputDecoration(labelText: '상품명'),
-              initialValue: widget.product == null ? '' : widget.product['title'],
+              initialValue: product == null ? '' : product.title,
               // autovalidate: true,
               validator: (String value) {
                 // if (value.trim().length <= 0) {
@@ -79,7 +110,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
             TextFormField(
               decoration: InputDecoration(labelText: '상품 설명'),
               maxLines: 4,
-              initialValue: widget.product == null ? '' : widget.product['description'],
+              initialValue:
+                  product == null ? '' : product.description,
               validator: (String value) {
                 // if (value.trim().length <= 0) {
                 if (value.isEmpty || value.length < 10) {
@@ -93,9 +125,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
             TextFormField(
               decoration: InputDecoration(labelText: '가격'),
               keyboardType: TextInputType.number,
-              initialValue: widget.product == null
-                  ? ''
-                  : widget.product['price'].toString(),
+              initialValue:
+                  product == null ? '' : product.price.toString(),
               validator: (String value) {
                 // if (value.trim().length <= 0) {
                 if (value.isEmpty ||
@@ -111,19 +142,21 @@ class _ProductEditPageState extends State<ProductEditPage> {
             SizedBox(
               height: 10.0,
             ),
-            OutlineButton(
-              // color: Theme.of(context).errorColor,
-              textColor: Colors.red,
-              child: Text('등록'),
-              onPressed: _submitForm,
-            )
-            // Text(titleValue)
+            _buildSubmitButton(),
           ],
         ),
       ),
     );
+  }
 
-    return widget.product == null
+  @override
+  Widget build(BuildContext context) {
+    
+
+    return ScopedModelDescendant<ProductsModel>(
+      builder: (BuildContext context, Widget child, ProductsModel model) {
+        final Widget pageContent = _buildPageContent(context, model.selectedProduct);
+        return model.selectedProductIndex == null
         ? pageContent
         : Scaffold(
             appBar: AppBar(
@@ -131,20 +164,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
             ),
             body: pageContent,
           );
-
-    // Center(
-    //   child: RaisedButton(
-    //     child: Text('저장하기'),
-    //     onPressed: () {
-    //       showModalBottomSheet(
-    //           context: context,
-    //           builder: (BuildContext context) {
-    //             return Center(
-    //               child: Text('모달이에용'),
-    //             );
-    //           });
-    //     },
-    //   ),
-    // );
+      },
+    ); 
   }
 }

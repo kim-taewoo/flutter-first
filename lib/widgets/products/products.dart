@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'package:scoped_model/scoped_model.dart';
+
 import './product_card.dart';
+import '../../models/product.dart';
+import '../../scoped-models/products.dart';
 
 // import './pages/product.dart';
 
 class Products extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  // final List<Map<String, dynamic>> products;
+  // final List<Product> products;
   // final Function deleteProduct;
 
   // named argument 와 달리 positional argument 의 optional(default) 값을 넣을 때는
@@ -17,9 +22,9 @@ class Products extends StatelessWidget {
   //   print('[Products Widget] Constructor');
   // }
 
-  Products(this.products) {
-    print('[Products Widget] Constructor');
-  }
+  // Products(this.products) {
+  //   print('[Products Widget] Constructor');
+  // }
 
   // Widget _buildProductItem(BuildContext context, int index) {
   //   return 카드 했던 것이지만 따로 widgets 로 만들면서 쓸모없어짐
@@ -47,7 +52,7 @@ class Products extends StatelessWidget {
   //   ],
   // )
 
-  Widget _buildProductList() {
+  Widget _buildProductList(List<Product> products) {
     Widget productCards;
     if (products.length > 0) {
       // 아래처럼 ListView.builder 로 해줘야 모든 렌더링을 한꺼번에 다 해놓지 않고 화면에 필요할 때 맞춰서 효과적으로 렌더링해줌.
@@ -65,6 +70,8 @@ class Products extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('[Products Widget] build()');
-    return _buildProductList();
+    return ScopedModelDescendant<ProductsModel>(builder: (BuildContext context, Widget child, ProductsModel model) {
+      return _buildProductList(model.products);
+    },); 
   }
 }

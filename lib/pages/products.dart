@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/products/products.dart';
+
+// scoped-model 을 쓰게 되면서 product 가 이 page 에 있을 필요가 없어졌다.
+// 애초에 데이터를 쓰는 곳은 Products Widget 이라서 그곳으로 보내는 경유지일 뿐이었기 때문.
+// import '../models/product.dart';
 // import '../product_manager.dart';
 // import './products_admin.dart';
 
 class ProductsPage extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  // final List<Map<String, dynamic>> products;
+  // final List<Product> products;
   // final Function addProduct;
   // final Function deleteProduct;
 
-  ProductsPage(this.products);
+  // ProductsPage(this.products);
 
 
   @override
@@ -44,7 +49,7 @@ class ProductsPage extends StatelessWidget {
       ),
       // named argument 에 value 넘길 때 : 을 쓴다. python 과 달리 = 이 아냐!
       // body: ProductManager(startingProduct: 'Food Tester'),
-      body: Products(products),
+      body: Products(),
     );
   }
 }
