@@ -3,7 +3,7 @@ import 'package:flutter/material.dart'; // flum 까지 치면 자동완성
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
-import '../scoped-models/products.dart';
+import '../scoped-models/main.dart';
 
 class ProductEditPage extends StatefulWidget {
   // final Function addProduct;
@@ -30,7 +30,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  void _submitForm(Function addProduct, Function updateProduct, [int selectedProductIndex]) {
+  void _submitForm(
+      Function addProduct, Function updateProduct, Function setSelectedProduct,
+      [int selectedProductIndex]) {
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -43,40 +45,46 @@ class _ProductEditPageState extends State<ProductEditPage> {
     // };
 
     if (selectedProductIndex == null) {
-      addProduct(Product(
-        title: _formData['title'],
-        description: _formData['description'],
-        price: _formData['price'],
-        image: _formData['image'],
-      ));
+      addProduct(
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
+      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
+          .then((_) => setSelectedProduct(null)));
     } else {
       updateProduct(
-          Product(
-            title: _formData['title'],
-            description: _formData['description'],
-            price: _formData['price'],
-            image: _formData['image'],
-          ));
+        _formData['title'],
+        _formData['description'],
+        _formData['image'],
+        _formData['price'],
+      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
+          .then((_) => setSelectedProduct(null)));
     }
-    Navigator.pushReplacementNamed(context, '/products');
   }
 
   Widget _buildSubmitButton() {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
-        return OutlineButton(
-          // color: Theme.of(context).errorColor,
-          textColor: Colors.red,
-          child: Text('등록'),
-          // _submitForm 을 또다시 화살표 함수로 감싸줌으로써, onPressed 가 눌려졌을 때만 _submitForm 을 호출하게 한다. 
-          onPressed: () => _submitForm(model.addProduct, model.updateProduct, model.selectedProductIndex),
-        );
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return model.isLoading
+            ? Center(child: CircularProgressIndicator())
+            : OutlineButton(
+                // color: Theme.of(context).errorColor,
+                textColor: Colors.red,
+                child: Text('등록'),
+                // _submitForm 을 또다시 화살표 함수로 감싸줌으로써, onPressed 가 눌려졌을 때만 _submitForm 을 호출하게 한다.
+                onPressed: () => _submitForm(
+                    model.addProduct,
+                    model.updateProduct,
+                    model.selectProduct,
+                    model.selectedProductIndex),
+              );
       },
     );
   }
 
   Widget _buildPageContent(BuildContext context, Product product) {
-final double deviceWidth = MediaQuery.of(context).size.width;
+    final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500 : deviceWidth * 0.95;
     final double targetPadding = deviceWidth - targetWidth;
     return Container(
@@ -110,8 +118,7 @@ final double deviceWidth = MediaQuery.of(context).size.width;
             TextFormField(
               decoration: InputDecoration(labelText: '상품 설명'),
               maxLines: 4,
-              initialValue:
-                  product == null ? '' : product.description,
+              initialValue: product == null ? '' : product.description,
               validator: (String value) {
                 // if (value.trim().length <= 0) {
                 if (value.isEmpty || value.length < 10) {
@@ -125,8 +132,7 @@ final double deviceWidth = MediaQuery.of(context).size.width;
             TextFormField(
               decoration: InputDecoration(labelText: '가격'),
               keyboardType: TextInputType.number,
-              initialValue:
-                  product == null ? '' : product.price.toString(),
+              initialValue: product == null ? '' : product.price.toString(),
               validator: (String value) {
                 // if (value.trim().length <= 0) {
                 if (value.isEmpty ||
@@ -151,20 +157,19 @@ final double deviceWidth = MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
-    
-
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
-        final Widget pageContent = _buildPageContent(context, model.selectedProduct);
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        final Widget pageContent =
+            _buildPageContent(context, model.selectedProduct);
         return model.selectedProductIndex == null
-        ? pageContent
-        : Scaffold(
-            appBar: AppBar(
-              title: Text('Edit Product'),
-            ),
-            body: pageContent,
-          );
+            ? pageContent
+            : Scaffold(
+                appBar: AppBar(
+                  title: Text('Edit Product'),
+                ),
+                body: pageContent,
+              );
       },
-    ); 
+    );
   }
 }

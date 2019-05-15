@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:scoped_model/scoped_model.dart';
+
+import '../scoped-models/main.dart';
+
 // 이 페이지를 만든 이유는, 라우팅을 했을 때 페이지 stack 을 쌓는 게 아니라 기존 페이지와 replace 하고 싶을 때가 있기 떄문이다.
 // 예를 들어 로그인을 한 후에 뒤로가기 버튼을 눌렀을 때, 다시 로그인 페이지로 가고 싶지는 않지 않겠니?
 
@@ -52,11 +56,12 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm(Function login) {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _formKey.currentState.save();
+    login(_formData['email'], _formData['password']);
     print(_formData);
     Navigator.pushReplacementNamed(context, '/products');
   }
@@ -103,12 +108,17 @@ class _AuthPageState extends State<AuthPage> {
                   SizedBox(
                     height: 10.0,
                   ),
-                  RaisedButton(
-                    color: Theme.of(context).primaryColor,
-                    textColor: Colors.white,
-                    child: Text('Login'),
-                    onPressed: _submitForm,
-                  ),
+                  ScopedModelDescendant<MainModel>(
+                    builder:
+                        (BuildContext context, Widget child, MainModel model) {
+                      return RaisedButton(
+                        color: Theme.of(context).primaryColor,
+                        textColor: Colors.white,
+                        child: Text('Login'),
+                        onPressed: () => _submitForm(model.login),
+                      );
+                    },
+                  )
                 ]),
               ),
             ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:scoped_model/scoped_model.dart';
+
 import './price_tag.dart';
 import '../ui_elements/title_default.dart';
 import '../../models/product.dart';
+import '../../scoped-models/main.dart';
 
 class ProductCard extends StatelessWidget {
   // final Map<String, dynamic> product;
@@ -37,7 +40,12 @@ class ProductCard extends StatelessWidget {
               // }),
               child: Column(
                 children: <Widget>[
-                  Image.asset(product.image),
+                  FadeInImage(
+                    image: NetworkImage(product.image),
+                    height: 300.0,
+                    fit: BoxFit.cover,
+                    placeholder: AssetImage('assets/food.jpg'),
+                  ),
                   Container(
                       padding: EdgeInsets.all(8),
                       child: Row(
@@ -45,25 +53,38 @@ class ProductCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             TitleDefault(product.title),
-                            SizedBox(width: 8.0,),
+                            SizedBox(
+                              width: 8.0,
+                            ),
                             PriceTag(product.price.toString())
                           ])),
                   Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 1.0),
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                      child: Text('서울시 종로구 혜화동, 12-33')),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 1.0),
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Text('서울시 종로구 혜화동, 12-33'),
+                  ),
+                  Text(product.userEmail),
                 ],
               )),
           Container(
               padding: EdgeInsets.symmetric(vertical: 10.0),
-              child: IconButton(
-                icon: Icon(Icons.star),
-                color: Colors.amber,
-                onPressed: () {},
+              child: ScopedModelDescendant<MainModel>(
+                builder: (BuildContext context, Widget child, MainModel model) {
+                  return IconButton(
+                    icon: Icon(model.allProducts[productIndex].isFavorite
+                        ? Icons.star
+                        : Icons.star_border),
+                    color: Colors.amber,
+                    onPressed: () {
+                      model.selectProduct(productIndex);
+                      model.toggleProductFavoriteStatus();
+                    },
+                  );
+                },
               ))
         ],
       ),

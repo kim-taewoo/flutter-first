@@ -7,7 +7,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/ui_elements/title_default.dart';
 import '../models/product.dart';
-import '../scoped-models/products.dart';
+import '../scoped-models/main.dart';
 
 class ProductPage extends StatelessWidget {
   final int productIndex;
@@ -60,9 +60,9 @@ class ProductPage extends StatelessWidget {
       // Future.value 로 현재스택(창)을 나가는 것과 Navigator.pop 으로 나가는 현재스택(창) 이 겹치면 이상한 오류가 발생한다.
       // 따라서 Navigator.pop 으로 이동할 것이라면 Future.value() 에는 false 값을 줘서 default action 을 막아주어야 한다.
       // 이 이상한 오류가 왜 생기냐면, Navigator.pop 도 화면 스택 맨 위에걸 없애는 거고, Future.value 도 없애는 거라 동시에 2개 없애려고 하는 뭐 그런 것 땜에 오류난다.
-    }, child: ScopedModelDescendant<ProductsModel>(
-        builder: (BuildContext context, Widget child, ProductsModel model) {
-      final Product product = model.products[productIndex];
+    }, child: ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      final Product product = model.allProducts[productIndex];
       return Scaffold(
         appBar: AppBar(
           title: Text(product.title),
@@ -73,7 +73,7 @@ class ProductPage extends StatelessWidget {
             // mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Image.asset(product.image),
+              Image.network(product.image),
               Container(
                 padding: EdgeInsets.all(10.0),
                 child: TitleDefault(product.title),

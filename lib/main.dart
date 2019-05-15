@@ -6,8 +6,7 @@ import './pages/auth.dart';
 import './pages/products_admin.dart';
 import './pages/products.dart';
 import './pages/product.dart';
-import './models/product.dart';
-import './scoped-models/products.dart';
+import './scoped-models/main.dart';
 
 // void main() => runApp(MyApp());
 void main() {
@@ -34,8 +33,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<ProductsModel>(
-      model: ProductsModel(),
+    final MainModel model = MainModel();
+    return ScopedModel<MainModel>(
+      model: model,
       child: MaterialApp(
         // debugShowMaterialGrid: true,
         theme: ThemeData(
@@ -49,9 +49,11 @@ class _MyAppState extends State<MyApp> {
           // '/' 는 home 이랑 역할이 같아서 둘 중 하나는 없애줘야 제대로 작동한다.
           '/': (BuildContext context) => AuthPage(),
           '/products': (BuildContext context) => ProductsPage(
+              model,
               // _products
               ),
           '/admin': (BuildContext context) => ProductAdminPage(
+              model,
               // _addProduct, _updateProduct, _deleteProduct, _products
               ),
         },
@@ -71,7 +73,7 @@ class _MyAppState extends State<MyApp> {
         // 예는 onGenerateRoute 같은 걸로 페이지 이동하는 게 실패하면 뭘 할 지를 말해준다. 404 페이지 같은 것.
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
-              builder: (BuildContext context) => ProductsPage());
+              builder: (BuildContext context) => ProductsPage(model));
         },
       ),
     );

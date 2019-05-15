@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 // import './products.dart';
 import './product_edit.dart';
 import './product_list.dart';
-import '../models/product.dart';
+import '../scoped-models/main.dart';
 
 class ProductAdminPage extends StatelessWidget {
+  final MainModel model;
+
+  ProductAdminPage(this.model);
   // final Function addProduct;
   // final Function updateProduct;
   // final Function deleteProduct;
@@ -71,6 +74,7 @@ class ProductAdminPage extends StatelessWidget {
                   // addProduct: addProduct
                 ),
                 ProductListPage(
+                  model
                     // products, updateProduct, deleteProduct
                 ),
               ],
