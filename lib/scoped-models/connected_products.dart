@@ -9,12 +9,12 @@ import '../models/user.dart';
 
 mixin ConnectedProductsModel on Model {
   List<Product> products = [];
-  int selProductIndex;
+  String selProductId;
   User authenticatedUser;
   bool isLoadingStatus = false;
   // void _addProduct(Map<String, dynamic> productData) {
 
-  Future<Null> addProduct(
+  Future<bool> addProduct(
       String title, String description, String image, double price) {
     isLoadingStatus = true;
     notifyListeners();
@@ -32,6 +32,11 @@ mixin ConnectedProductsModel on Model {
             'https://flutter-first-project-f49da.firebaseio.com/products.json',
             body: json.encode(productData))
         .then((http.Response response) {
+          if (response.statusCode != 200 || response.statusCode != 201) {
+            isLoadingStatus = false;
+            notifyListeners();
+            return false;
+          }
       final Map<String, dynamic> responseData = json.decode(response.body);
       print(responseData);
       final Product newProduct = Product(
@@ -45,6 +50,11 @@ mixin ConnectedProductsModel on Model {
       products.add(newProduct);
       isLoadingStatus = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      isLoadingStatus = false;
+      notifyListeners();
+      return false;
     });
   }
 }

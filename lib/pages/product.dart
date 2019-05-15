@@ -10,13 +10,9 @@ import '../models/product.dart';
 import '../scoped-models/main.dart';
 
 class ProductPage extends StatelessWidget {
-  final int productIndex;
-  // final String title;
-  // final String imageUrl;
-  // final double price;
-  // final String description;
+  final Product product;
 
-  ProductPage(this.productIndex);
+  ProductPage(this.product);
 
   _showWarningDialog(BuildContext context) {
     showDialog(
@@ -49,21 +45,20 @@ class ProductPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // 전체 페이지(Scaffold) 를 감싸는 이 WillPopScope widget 은 자동으로 생성되는 back 버튼이나 기계의 뒤로가기 버튼이
     // 눌렸을 때의 행동을 준비하는 callback 을 등록한다(리스너 등록).
-    return WillPopScope(onWillPop: () {
-      // 이 onWillPop argument 는 뒤로가기를 통해 유저가 나갈 때 나가도록 허용할 것인지, 허용한다면 뭘 할 지의 함수 설정
-      print('back button pressed');
-      Navigator.pop(context, false);
-      // 그냥 뒤로가기 눌렀을 때는 삭제하는 게 아니라서 false 를 가지고 나가게 함.
-      return Future.value(false);
-      // onWillPop 에 마우스를 올려보면, future 를 return 해야 함 을 알 수 있다.
-      // 이 future 는 dart:async 를 import 해줘야 쓸 수 있다.
-      // Future.value 로 현재스택(창)을 나가는 것과 Navigator.pop 으로 나가는 현재스택(창) 이 겹치면 이상한 오류가 발생한다.
-      // 따라서 Navigator.pop 으로 이동할 것이라면 Future.value() 에는 false 값을 줘서 default action 을 막아주어야 한다.
-      // 이 이상한 오류가 왜 생기냐면, Navigator.pop 도 화면 스택 맨 위에걸 없애는 거고, Future.value 도 없애는 거라 동시에 2개 없애려고 하는 뭐 그런 것 땜에 오류난다.
-    }, child: ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget child, MainModel model) {
-      final Product product = model.allProducts[productIndex];
-      return Scaffold(
+    return WillPopScope(
+      onWillPop: () {
+        // 이 onWillPop argument 는 뒤로가기를 통해 유저가 나갈 때 나가도록 허용할 것인지, 허용한다면 뭘 할 지의 함수 설정
+        print('back button pressed');
+        Navigator.pop(context, false);
+        // 그냥 뒤로가기 눌렀을 때는 삭제하는 게 아니라서 false 를 가지고 나가게 함.
+        return Future.value(false);
+        // onWillPop 에 마우스를 올려보면, future 를 return 해야 함 을 알 수 있다.
+        // 이 future 는 dart:async 를 import 해줘야 쓸 수 있다.
+        // Future.value 로 현재스택(창)을 나가는 것과 Navigator.pop 으로 나가는 현재스택(창) 이 겹치면 이상한 오류가 발생한다.
+        // 따라서 Navigator.pop 으로 이동할 것이라면 Future.value() 에는 false 값을 줘서 default action 을 막아주어야 한다.
+        // 이 이상한 오류가 왜 생기냐면, Navigator.pop 도 화면 스택 맨 위에걸 없애는 거고, Future.value 도 없애는 거라 동시에 2개 없애려고 하는 뭐 그런 것 땜에 오류난다.
+      },
+      child: Scaffold(
         appBar: AppBar(
           title: Text(product.title),
         ),
@@ -73,7 +68,12 @@ class ProductPage extends StatelessWidget {
             // mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Image.network(product.image),
+              FadeInImage(
+                image: NetworkImage(product.image),
+                height: 300.0,
+                fit: BoxFit.cover,
+                placeholder: AssetImage('assets/food.jpg'),
+              ),
               Container(
                 padding: EdgeInsets.all(10.0),
                 child: TitleDefault(product.title),
@@ -112,7 +112,7 @@ class ProductPage extends StatelessWidget {
             ],
           ),
         ),
-      );
-    }));
+      ),
+    );
   }
 }

@@ -26,21 +26,29 @@ mixin ProductsModel on ConnectedProductsModel {
   }
 
   int get selectedProductIndex {
-    return selProductIndex;
+    return products.indexWhere((Product product) {
+      return product.uid == selProductId;
+    });
+  }
+
+  String get selectedProductId {
+    return selProductId;
   }
 
   Product get selectedProduct {
-    if (selProductIndex == null) {
+    if (selProductId == null) {
       return null;
     }
-    return products[selProductIndex];
+    return products.firstWhere((Product product) {
+      return product.uid == selProductId;
+    });
   }
 
   bool get displayFavoritesOnly {
     return _showFavorites;
   }
 
-  Future<Null> updateProduct(
+  Future<bool> updateProduct(
       String title, String description, String image, double price) {
     isLoadingStatus = true;
     notifyListeners();
@@ -70,21 +78,31 @@ mixin ProductsModel on ConnectedProductsModel {
       );
       products[selectedProductIndex] = updatedProduct;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      isLoadingStatus = false;
+      notifyListeners();
+      return false;
     });
   }
 
-  void deleteProduct() {
+  Future<bool> deleteProduct() {
     isLoadingStatus = true;
     final deletedProductId = selectedProduct.uid;
     products.removeAt(selectedProductIndex);
-    selProductIndex = null;
+    selProductId = null;
     notifyListeners();
-    http
+    return http
         .delete(
             'https://flutter-first-project-f49da.firebaseio.com/products/${deletedProductId}.json')
         .then((http.Response response) {
-          isLoadingStatus = false;
-          notifyListeners();
+      isLoadingStatus = false;
+      notifyListeners();
+      return true;
+    }).catchError((error) {
+      isLoadingStatus = false;
+      notifyListeners();
+      return false;
     });
   }
 
@@ -92,7 +110,7 @@ mixin ProductsModel on ConnectedProductsModel {
     isLoadingStatus = true;
     return http
         .get('https://flutter-first-project-f49da.firebaseio.com/products.json')
-        .then((http.Response response) {
+        .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
       if (productListData == null) {
@@ -115,6 +133,11 @@ mixin ProductsModel on ConnectedProductsModel {
       products = fetchedProductList;
       isLoadingStatus = false;
       notifyListeners();
+      selProductId = null;
+    }).catchError((error) {
+      isLoadingStatus = false;
+      notifyListeners();
+      return;
     });
   }
 
@@ -122,6 +145,7 @@ mixin ProductsModel on ConnectedProductsModel {
     final bool isCurrentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
     final Product updatedProduct = Product(
+      uid: selectedProduct.uid,
       description: selectedProduct.description,
       image: selectedProduct.image,
       price: selectedProduct.price,
@@ -134,9 +158,9 @@ mixin ProductsModel on ConnectedProductsModel {
     notifyListeners(); // 이거 한 줄 써줘야 builder 가 재작동해서 live update 가 된다. (StatefulWidget 의 setState 와 비슷)
   }
 
-  void selectProduct(int index) {
-    selProductIndex = index;
-    if (index != null) {
+  void selectProduct(String productId) {
+    selProductId = productId;
+    if (selectedProductIndex != null) {
       notifyListeners();
     }
   }

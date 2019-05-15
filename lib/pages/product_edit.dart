@@ -44,14 +44,33 @@ class _ProductEditPageState extends State<ProductEditPage> {
     //   'image': 'assets/food.jpg'
     // };
 
-    if (selectedProductIndex == null) {
+    if (selectedProductIndex == -1) {
       addProduct(
         _formData['title'],
         _formData['description'],
         _formData['image'],
         _formData['price'],
-      ).then((_) => Navigator.pushReplacementNamed(context, '/products')
-          .then((_) => setSelectedProduct(null)));
+      ).then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/products')
+              .then((_) => setSelectedProduct(null));
+        } else {
+          showDialog(
+              context: context, // 이 context는 그냥 build 에 있었다고 생각하면 된다.
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Someting went wrong'),
+                  content: Text('Please try again!'),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text('Okay'),
+                    )
+                  ],
+                );
+              });
+        }
+      });
     } else {
       updateProduct(
         _formData['title'],
@@ -161,7 +180,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       builder: (BuildContext context, Widget child, MainModel model) {
         final Widget pageContent =
             _buildPageContent(context, model.selectedProduct);
-        return model.selectedProductIndex == null
+        return model.selectedProductIndex == -1
             ? pageContent
             : Scaffold(
                 appBar: AppBar(
