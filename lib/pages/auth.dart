@@ -4,6 +4,8 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../scoped-models/main.dart';
 
+enum AuthMode { Signup, Login }
+
 // 이 페이지를 만든 이유는, 라우팅을 했을 때 페이지 stack 을 쌓는 게 아니라 기존 페이지와 replace 하고 싶을 때가 있기 떄문이다.
 // 예를 들어 로그인을 한 후에 뒤로가기 버튼을 눌렀을 때, 다시 로그인 페이지로 가고 싶지는 않지 않겠니?
 
@@ -21,6 +23,8 @@ class _AuthPageState extends State<AuthPage> {
     'acceptTerms': false
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordTextController = TextEditingController();
+  AuthMode _authMode = AuthMode.Login;
 
   Widget _buildEmailTextField() {
     return TextFormField(
@@ -45,6 +49,7 @@ class _AuthPageState extends State<AuthPage> {
       decoration: InputDecoration(
           labelText: 'Password', filled: true, fillColor: Colors.white),
       obscureText: true,
+      controller: _passwordTextController,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
           return 'Password invalid';
@@ -56,14 +61,50 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm(Function login) {
+  Widget _buildPasswordConfirmTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: 'Confirm Password', filled: true, fillColor: Colors.white),
+      obscureText: true,
+      validator: (String value) {
+        if (_passwordTextController.text != value) {
+          return 'Password do not match';
+        }
+      },
+    );
+  }
+
+  void _submitForm(Function login, Function signup) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _formKey.currentState.save();
-    login(_formData['email'], _formData['password']);
-    print(_formData);
-    Navigator.pushReplacementNamed(context, '/products');
+    if (_authMode == AuthMode.Login) {
+      login(_formData['email'], _formData['password']);
+    } else {
+      final Map<String, dynamic> successInformation =
+          await signup(_formData['email'], _formData['password']);
+      if (successInformation['success']) {
+        Navigator.pushReplacementNamed(context, '/products');
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('An Error Occurred!'),
+                content: Text(successInformation['message']),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Okay'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+      }
+    }
   }
 
   @override
@@ -97,26 +138,56 @@ class _AuthPageState extends State<AuthPage> {
                     height: 10.0,
                   ),
                   _buildPasswordTextField(),
+                  _authMode == AuthMode.Signup
+                      ? Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            _buildPasswordConfirmTextField(),
+                          ],
+                        )
+                      : Container(),
                   SwitchListTile(
-                      value: _formData['acceptTerms'],
-                      onChanged: (bool value) {
-                        setState(() {
-                          _formData['acceptTerms'] = value;
-                        });
-                      },
-                      title: Text('Accept terms')),
+                    value: _formData['acceptTerms'],
+                    onChanged: (bool value) {
+                      setState(() {
+                        _formData['acceptTerms'] = value;
+                      });
+                    },
+                    title: Text('Accept terms'),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  FlatButton(
+                    child: Text(
+                        'Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
+                    onPressed: () {
+                      setState(() {
+                        _authMode = _authMode == AuthMode.Login
+                            ? AuthMode.Signup
+                            : AuthMode.Login;
+                      });
+                    },
+                  ),
                   SizedBox(
                     height: 10.0,
                   ),
                   ScopedModelDescendant<MainModel>(
                     builder:
                         (BuildContext context, Widget child, MainModel model) {
-                      return RaisedButton(
-                        color: Theme.of(context).primaryColor,
-                        textColor: Colors.white,
-                        child: Text('Login'),
-                        onPressed: () => _submitForm(model.login),
-                      );
+                      return model.isLoading
+                          ? CircularProgressIndicator()
+                          : RaisedButton(
+                              color: Theme.of(context).primaryColor,
+                              textColor: Colors.white,
+                              child: Text(_authMode == AuthMode.Login
+                                  ? 'LOGIN'
+                                  : 'SIGNUP'),
+                              onPressed: () =>
+                                  _submitForm(model.login, model.signup),
+                            );
                     },
                   )
                 ]),
